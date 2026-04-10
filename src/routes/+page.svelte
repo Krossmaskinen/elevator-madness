@@ -2,7 +2,7 @@
   import { GameLoop } from "$lib/adapters/game-loop/gameLoopAdapter";
   import { getElevator } from "../features/Elevator/public/data-generator";
   import { ElevatorService } from "../features/Elevator/public";
-  import ElevatorView from "../features/Elevator/public/ElevatorView.svelte";
+  import { ElevatorView } from "../features/Elevator/public";
   import {
     getElevatorOnFloor,
     hasInboundElevator,
