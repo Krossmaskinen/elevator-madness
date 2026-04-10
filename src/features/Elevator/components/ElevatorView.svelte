@@ -34,11 +34,11 @@
 <div class="container max-w-1/2 mx-auto flex flex-col items-center gap-4 py-4">
   <h1 class="text-bold text-2xl">Elevator Madness</h1>
   <p>
-    Press a button on a floor to call an elevator. On press the button below
+    Press a button on a floor to call an elevator. Or press the button below
     and...
   </p>
   <button
-    class="border border-black bg-amber-300 p-1 rounded"
+    class="border border-black bg-amber-300 p-1 rounded cursor-pointer hover:bg-amber-400"
     onclick={onCallRandom}
   >
     <span>⚠️ Go crazy</span>

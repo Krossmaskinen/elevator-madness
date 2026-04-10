@@ -1,42 +1,20 @@
-# sv
+# Elevator Madness
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+## Installation
 
-## Creating a project
+Classic `npm i` or `yarn`
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Run
 
-```sh
-# create a new project
-npx sv create my-app
-```
+`npm run dev` or `npm run dev -- --open` if you want to open the app immediately in the browser.
 
-To recreate this project with the same configuration:
+## How to use
 
-```sh
-# recreate this project
-npx sv@0.15.0 create --template minimal --types ts --add eslint vitest="usages:component,unit" playwright tailwindcss="plugins:none" --install npm elevator-madness
-```
+Click on the buttons on the floors to call the closest elevator. If there are no elevators free the floor is added to a queue and will be called when an elevator becomes available.
 
-## Developing
+The Go Crazy button will call 5 elevators to random floors.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+⚪ - idle floor
+🟢 - has elevator
+🟡 - elevator inbound
+🟠 - waiting for free elevator
