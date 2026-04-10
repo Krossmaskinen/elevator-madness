@@ -1,11 +1,5 @@
 <script lang="ts">
-  const {
-    callElevator,
-    floorNumber,
-    hasInboundElevator,
-    hasElevator,
-    hasElevatorInQueue,
-  } = $props();
+  const { callElevator, floorNumber, isDisabled, icon } = $props();
 </script>
 
 <div class="flex flex-row justify-between w-16">
@@ -14,19 +8,10 @@
     <button
       class="disabled:opacity-50 not-disabled:cursor-pointer"
       onclick={() => callElevator(floorNumber)}
-      disabled={hasInboundElevator || hasElevator || hasElevatorInQueue}
-      >🔘</button
+      disabled={isDisabled}>🔘</button
     >
   </div>
   <div class="w-5">
-    {#if hasInboundElevator}
-      🟡
-    {:else if hasElevator}
-      🟢
-    {:else if hasElevatorInQueue}
-      🟠
-    {:else}
-      ⚪
-    {/if}
+    <span>{icon}</span>
   </div>
 </div>

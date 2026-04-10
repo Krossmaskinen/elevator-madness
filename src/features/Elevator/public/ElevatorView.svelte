@@ -1,5 +1,11 @@
 <script lang="ts">
   import Floor from "$lib/components/Floor.svelte";
+  import type { FloorViewModel } from "$lib/types";
+  import {
+    hasInboundElevator,
+    getElevatorOnFloor,
+  } from "$lib/utils/elevatorUtils";
+  import { getFloorViewModel } from "$lib/utils/floorUtils";
   import SingleElevator from "../components/SingleElevator.svelte";
   import type { Elevator } from "../types";
   import type { ElevatorService } from "../use-cases/elevatorService";
@@ -13,27 +19,44 @@
   }
   const { floors, elevators, elevatorService, settings, onCallRandom }: Props =
     $props();
+
+  const floorViewModels: FloorViewModel[] = $derived(
+    floors.map((floor) =>
+      getFloorViewModel({
+        floorNumber: floor,
+        hasInboundElevator: hasInboundElevator(floor, elevators),
+        hasElevator: !!getElevatorOnFloor(floor, elevators),
+        isQueued: elevatorService.isFloorQueued(floor),
+      }),
+    ),
+  );
 </script>
 
-<div class="container w-half mx-auto">
-  <h1>Elevator Madness</h1>
-  <button onclick={onCallRandom}>Go crazy</button>
+<div class="container max-w-1/2 mx-auto flex flex-col items-center gap-4 py-4">
+  <h1 class="text-bold text-2xl">Elevator Madness</h1>
+  <p>
+    Press a button on a floor to call an elevator. On press the button below
+    and...
+  </p>
+  <button
+    class="border border-black bg-amber-300 p-1 rounded"
+    onclick={onCallRandom}
+  >
+    <span>⚠️ Go crazy</span>
+  </button>
 
-  <div class="flex justify-start">
+  <div class="flex justify-start mt-4">
     <div
       class="flex flex-col h-80vh px-2 border-solid border-black border-2"
       id="floors"
     >
-      {#each floors as floor (floor)}
+      {#each floorViewModels as floor (floor.floorNumber)}
         <div class="h-8">
           <Floor
-            hasInboundElevator={!!elevatorService.getInboundElevator(floor)}
-            hasElevator={!!elevatorService.getElevatorOnFloor(floor)}
-            floorNumber={floor}
+            {...floor}
             callElevator={(floorNumber: number) => {
               elevatorService.callElevator(floorNumber);
             }}
-            hasElevatorInQueue={false}
           />
         </div>
       {/each}

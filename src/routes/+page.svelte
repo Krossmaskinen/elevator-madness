@@ -1,14 +1,18 @@
 <script lang="ts">
   import { GameLoop } from "$lib/adapters/game-loop/gameLoopAdapter";
-  import {
-    getElevator,
-    getRandomNumber,
-  } from "../features/Elevator/public/data-generator";
+  import { getElevator } from "../features/Elevator/public/data-generator";
   import { ElevatorService } from "../features/Elevator/public";
   import ElevatorView from "../features/Elevator/public/ElevatorView.svelte";
+  import {
+    getElevatorOnFloor,
+    hasInboundElevator,
+  } from "$lib/utils/elevatorUtils";
+  import { getRandomNumber } from "$lib/utils/data-generator";
+  import type { Elevator } from "../features/Elevator/types";
+  import { getFloors } from "$lib/utils/floorUtils";
 
   const settings = {
-    numberOfFloors: 10,
+    numberOfFloors: 20,
     floorHeight: 2, // spacing
     refreshRateMs: 16,
   };
@@ -20,42 +24,38 @@
   const elevatorService = new ElevatorService(elevatorContext);
   const gameLoop = new GameLoop({ updateInterval: settings.refreshRateMs });
 
+  elevatorService.onArrive((elevatorId: string) => {
+    if (elevatorService.hasQueuedFloors()) {
+      elevatorService.callToNextInQueue(elevatorId);
+    }
+  });
+
   gameLoop.start((deltaTime: number) => {
     elevatorService.updateProgress(deltaTime);
   });
 
-  function getFloors(amount: number) {
-    let floorNumbers: number[] = [];
-
-    for (let i = amount; i >= 1; i--) {
-      floorNumbers.push(i);
-    }
-    return floorNumbers;
-  }
-
-  function callRandomFloors(amount: number) {
+  function callRandomFloors(amount: number, elevators: Elevator[]) {
     const calledElevators = [NaN];
+    let failedAttempts = 0;
 
     for (let i = 0; i < amount; ++i) {
       let floorToCall = NaN;
       let floorIsValid = false;
 
-      while (!floorIsValid) {
+      while (!floorIsValid && failedAttempts < settings.numberOfFloors) {
         floorToCall = getRandomNumber(1, settings.numberOfFloors);
 
         floorIsValid =
           !calledElevators.includes(floorToCall) &&
-          !elevatorService.getElevatorOnFloor(floorToCall) &&
-          !elevatorService.getInboundElevator(floorToCall);
+          !getElevatorOnFloor(floorToCall, elevators) &&
+          !hasInboundElevator(floorToCall, elevators);
+
+        if (!floorIsValid) {
+          ++failedAttempts;
+        }
       }
 
-      console.log(`valid floor ${floorToCall}`);
-
       elevatorService.callElevator(floorToCall);
-
-      console.log(
-        `selected elevator ${elevatorService.getInboundElevator(floorToCall)}`,
-      );
       calledElevators.push(floorToCall);
     }
   }
@@ -66,5 +66,5 @@
   {elevators}
   {elevatorService}
   {settings}
-  onCallRandom={() => callRandomFloors(5)}
+  onCallRandom={() => callRandomFloors(5, elevators)}
 />

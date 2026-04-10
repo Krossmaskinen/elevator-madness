@@ -1,175 +1,170 @@
-import { getElevator, getRandomNumber } from "../public/data-generator";
+import { getElevator } from "../public/data-generator";
 import type { IElevatorContext } from "../interfaces/elevatorContext";
 import type { Elevator } from "../types";
 import { ElevatorService } from "./elevatorService";
+import { getRandomNumber } from "$lib/utils/data-generator";
 
 describe("ElevatorService", () => {
-	it("should call the elevator to a specific floor", () => {
-		const elevator = getElevator({ currentFloor: 0 });
-		const elevatorContext = getElevatorContext([elevator]);
+  it("should call the elevator to a specific floor", () => {
+    const elevator = getElevator({ currentFloor: 0 });
+    const elevatorContext = getElevatorContext([elevator]);
+    const elevatorService = getElevatorService([elevator]);
 
-		const elevatorService = new ElevatorService(elevatorContext);
-		elevatorService.callElevator(5);
+    elevatorService.callElevator(5);
 
-		expect(elevatorContext.getElevators()[0].targetFloor).toBe(5);
-	});
+    expect(elevatorContext.getElevators()[0].targetFloor).toBe(5);
+  });
 
-	it("should update the elevator progress", () => {
-		const currentFloor = getRandomNumber(0, 10);
-		const targetFloor = getRandomNumber(0, 10, currentFloor);
-		const numbersOfFloorsToMove = Math.abs(targetFloor - currentFloor);
-		const speedInMsPerFloor = 2000;
-		const totalMoveTime = numbersOfFloorsToMove * speedInMsPerFloor;
+  it("should update the elevator progress", () => {
+    const currentFloor = getRandomNumber(0, 10);
+    const targetFloor = getRandomNumber(0, 10, currentFloor);
+    const numbersOfFloorsToMove = Math.abs(targetFloor - currentFloor);
+    const speedInMsPerFloor = 2000;
+    const totalMoveTime = numbersOfFloorsToMove * speedInMsPerFloor;
 
-		const firstTimePassedMs = getRandomNumber(0, totalMoveTime);
-		const expectedFirstProgress = firstTimePassedMs / totalMoveTime;
+    const firstTimePassedMs = getRandomNumber(0, totalMoveTime);
+    const expectedFirstProgress = firstTimePassedMs / totalMoveTime;
 
-		const elevator = getElevator({
-			currentFloor,
-			targetFloor,
-			isMoving: true,
-			speedInMsPerFloor,
-		});
-		const elevatorContext = getElevatorContext([elevator]);
+    const elevator = getElevator({
+      currentFloor,
+      targetFloor,
+      isMoving: true,
+      speedInMsPerFloor,
+    });
+    const elevatorContext = getElevatorContext([elevator]);
 
-		const elevatorService = new ElevatorService(elevatorContext);
-		elevatorService.updateProgress(firstTimePassedMs);
+    const elevatorService = new ElevatorService(elevatorContext);
+    elevatorService.updateProgress(firstTimePassedMs);
 
-		expect(elevatorContext.getElevators()[0].progress).toBe(
-			expectedFirstProgress,
-		);
-	});
+    expect(elevatorContext.getElevators()[0].progress).toBe(
+      expectedFirstProgress,
+    );
+  });
 
-	it("should reset values on arrival", () => {
-		const elevator = getElevator({
-			currentFloor: 0,
-			targetFloor: 2,
-			progress: 0.3,
-			isMoving: true,
-			id: "1",
-		});
-		const elevatorContext = getElevatorContext([elevator]);
-		const elevatorService = new ElevatorService(elevatorContext);
+  it("should reset values on arrival", () => {
+    const elevator = getElevator({
+      currentFloor: 0,
+      targetFloor: 2,
+      progress: 0.3,
+      isMoving: true,
+      id: "1",
+    });
+    const elevatorContext = getElevatorContext([elevator]);
+    const elevatorService = getElevatorService([elevator]);
 
-		elevatorService.arriveAtFloor(elevatorContext.getElevators()[0].id);
+    elevatorService.arriveAtFloor(elevatorContext.getElevators()[0].id);
 
-		expect(elevator.currentFloor).toBe(2);
-		expect(elevator.progress).toBe(0);
-		expect(elevator.targetFloor).toBeNull();
-		expect(elevator.isMoving).toBeFalsy();
-	});
+    expect(elevator.currentFloor).toBe(2);
+    expect(elevator.progress).toBe(0);
+    expect(elevator.targetFloor).toBeNull();
+    expect(elevator.isMoving).toBeFalsy();
+  });
 
-	it("should arrive when progress is complete", () => {
-		const elevator = getElevator({
-			currentFloor: 0,
-			targetFloor: 2,
-			speedInMsPerFloor: 2000,
-			isMoving: true,
-			progress: 0,
-		});
-		const elevatorContext = getElevatorContext([elevator]);
-		const elevatorService = new ElevatorService(elevatorContext);
+  it("should arrive when progress is complete", () => {
+    const elevator = getElevator({
+      currentFloor: 0,
+      targetFloor: 2,
+      speedInMsPerFloor: 2000,
+      isMoving: true,
+      progress: 0,
+    });
+    const elevatorService = getElevatorService([elevator]);
 
-		elevatorService.updateProgress(2000);
+    elevatorService.updateProgress(2000);
 
-		expect(elevator.progress).toBe(0.5);
+    expect(elevator.progress).toBe(0.5);
 
-		elevatorService.updateProgress(2001);
+    elevatorService.updateProgress(2001);
 
-		expect(elevator.currentFloor).toBe(2);
-		expect(elevator.progress).toBe(0);
-		expect(elevator.targetFloor).toBeNull();
-		expect(elevator.isMoving).toBeFalsy();
-	});
+    expect(elevator.currentFloor).toBe(2);
+    expect(elevator.progress).toBe(0);
+    expect(elevator.targetFloor).toBeNull();
+    expect(elevator.isMoving).toBeFalsy();
+  });
 
-	it("should calculate where the elevator is located", () => {
-		const elevator = getElevator({
-			currentFloor: 2,
-			targetFloor: 4,
-			speedInMsPerFloor: 2000,
-			isMoving: true,
-			progress: 0.25,
-		});
-		const elevatorContext = getElevatorContext([elevator]);
-		const elevatorService = new ElevatorService(elevatorContext);
+  it("should calculate where the elevator is located", () => {
+    const elevator = getElevator({
+      currentFloor: 2,
+      targetFloor: 4,
+      speedInMsPerFloor: 2000,
+      isMoving: true,
+      progress: 0.25,
+    });
+    const elevatorService = getElevatorService([elevator]);
 
-		const elevatorPositionRelativeToCurrentFloor =
-			elevatorService.getElevatorPosition(elevator.id);
+    const elevatorPositionRelativeToCurrentFloor =
+      elevatorService.getElevatorPosition(elevator.id);
 
-		expect(elevatorPositionRelativeToCurrentFloor).toBeTruthy();
+    expect(elevatorPositionRelativeToCurrentFloor).toBeTruthy();
 
-		const targetFloor = elevator.targetFloor || 0;
-		const expectedPosition =
-			(targetFloor - elevator.currentFloor) * elevator.progress +
-			elevator.currentFloor;
+    const targetFloor = elevator.targetFloor || 0;
+    const expectedPosition =
+      (targetFloor - elevator.currentFloor) * elevator.progress +
+      elevator.currentFloor;
 
-		expect(elevatorService.getElevatorPosition(elevator.id)).toBe(
-			expectedPosition,
-		);
-	});
+    expect(elevatorService.getElevatorPosition(elevator.id)).toBe(
+      expectedPosition,
+    );
+  });
 
-	it("should find the closest elevator to a floor", () => {
-		const elevator1 = getElevator({ currentFloor: 0, id: "1" });
-		const elevator2 = getElevator({ currentFloor: 5, id: "2" });
-		const elevator3 = getElevator({ currentFloor: 10, id: "3" });
-		const elevatorContext = getElevatorContext([
-			elevator1,
-			elevator2,
-			elevator3,
-		]);
-		const elevatorService = new ElevatorService(elevatorContext);
+  it("should queue a floor when no elevator is available", () => {
+    const elevator = getElevator({
+      currentFloor: 3,
+      isMoving: true,
+      targetFloor: 2,
+      id: "1",
+    });
+    const elevatorService = getElevatorService([elevator]);
+    const floor = 1;
 
-		const closestElevatorToFloor4 =
-			elevatorService.getClosestElevatorToFloor(4);
-		expect(closestElevatorToFloor4?.id).toBe("2");
+    elevatorService.callElevator(floor);
 
-		const closestElevatorToFloor9 =
-			elevatorService.getClosestElevatorToFloor(9);
-		expect(closestElevatorToFloor9?.id).toBe("3");
+    expect(elevatorService.isFloorQueued(floor)).toBeTruthy();
+  });
 
-		const closestElevatorToFloor1 =
-			elevatorService.getClosestElevatorToFloor(1);
-		expect(closestElevatorToFloor1?.id).toBe("1");
-	});
+  it("should call an elevator to the next floor in queue", () => {
+    const elevator = getElevator({
+      currentFloor: 3,
+      isMoving: true,
+      targetFloor: 2,
+      id: "1",
+    });
+    const elevatorService = getElevatorService([elevator]);
+    const floor = 1;
 
-	it("should see if a floor has an inbound elevator", () => {
-		const targetFloor = getRandomNumber(0, 10);
-		const elevator = getElevator({
-			currentFloor: 0,
-			isMoving: true,
-			targetFloor,
-			id: "1",
-		});
-		const elevatorContext = getElevatorContext([elevator]);
-		const elevatorService = new ElevatorService(elevatorContext);
+    elevatorService.callElevator(floor);
 
-		expect(elevatorService.getInboundElevator(targetFloor)).toBe("1");
-	});
+    expect(elevatorService.isFloorQueued(floor)).toBeTruthy();
 
-	it("should see if a floor has an elevator", () => {
-		const currentFloor = getRandomNumber(0, 10);
-		const elevator = getElevator({
-			currentFloor,
-			isMoving: false,
-			targetFloor: null,
-			id: "1",
-		});
-		const elevatorContext = getElevatorContext([elevator]);
-		const elevatorService = new ElevatorService(elevatorContext);
+    elevatorService.arriveAtFloor(elevator.id);
+    elevatorService.callToNextInQueue(elevator.id);
 
-		expect(elevatorService.getElevatorOnFloor(currentFloor)).toBe("1");
+    expect(elevatorService.isFloorQueued(floor)).toBeFalsy();
+  });
 
-		elevator.isMoving = true;
-		expect(elevatorService.getElevatorOnFloor(currentFloor)).toBeFalsy();
+  it("should call set callback when an elevator arrives", () => {
+    const elevator = getElevator({
+      isMoving: true,
+      targetFloor: 2,
+      currentFloor: 1,
+    });
+    const elevatorService = getElevatorService([elevator]);
+    const onArrive = vi.fn();
 
-		elevator.isMoving = false;
-		elevator.currentFloor = 11;
-		expect(elevatorService.getElevatorOnFloor(currentFloor)).toBeFalsy();
-	});
+    elevatorService.onArrive(onArrive);
+
+    elevatorService.arriveAtFloor(elevator.id);
+
+    expect(onArrive).toHaveBeenCalledWith(elevator.id);
+  });
 });
 
+function getElevatorService(elevators: Elevator[]): ElevatorService {
+  return new ElevatorService(getElevatorContext(elevators));
+}
+
 function getElevatorContext(elevators: Elevator[]): IElevatorContext {
-	return {
-		getElevators: () => elevators,
-	};
+  return {
+    getElevators: () => elevators,
+  };
 }
