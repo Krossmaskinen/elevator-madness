@@ -7,7 +7,7 @@ describe("Queue", () => {
     queue.add(1);
     queue.add(2);
 
-    expect(queue.peek()).toHaveLength(2);
+    expect(queue.items()).toHaveLength(2);
   });
 
   it("should remove items from the queue", () => {

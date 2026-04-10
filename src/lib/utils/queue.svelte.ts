@@ -1,8 +1,7 @@
 export class Queue<T> {
-  private queueList: T[] = $state([])
+  private queueList: T[] = $state([]);
 
-  constructor() {
-  }
+  constructor() {}
 
   add(item: T) {
     this.queueList.push(item);
@@ -16,7 +15,11 @@ export class Queue<T> {
     return this.queueList.includes(item);
   }
 
-  peek(): T[] {
+  isEmpty(): boolean {
+    return this.queueList.length === 0;
+  }
+
+  items(): T[] {
     return [...this.queueList];
   }
 }

@@ -1,7 +1,7 @@
+import type { Elevator } from "$lib/types";
 import { getClosestElevatorToFloor } from "$lib/utils/elevatorUtils";
 import { Queue } from "$lib/utils/queue.svelte";
 import type { IElevatorContext } from "../interfaces/elevatorContext";
-import type { Elevator } from "../types";
 
 export class ElevatorService {
   private elevatorContext: IElevatorContext;
@@ -95,7 +95,7 @@ export class ElevatorService {
   };
 
   public hasQueuedFloors = (): boolean => {
-    return !!this.queue.peek().length;
+    return !this.queue.isEmpty();
   };
 
   public onArrive = (callback: (id: string) => void): void => {
@@ -121,7 +121,6 @@ export class ElevatorService {
     elevator: Elevator | undefined,
   ): elevator is Elevator {
     if (!elevator) {
-      console.log("Elevator not found.");
       return false;
     }
     return true;

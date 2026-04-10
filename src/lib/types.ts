@@ -1,10 +1,14 @@
-export enum FLOOR_STATUS {
-	HAS_INBOUND = "HAS_INBOUND",
-	HAS_ELEVATOR = "HAS_ELEVATOR",
+export interface Elevator {
+  id: string;
+  currentFloor: number;
+  targetFloor: number | null;
+  isMoving: boolean;
+  progress: number;
+  speedInMsPerFloor: number;
 }
 
 export interface FloorViewModel {
-	floorNumber: number;
-	isDisabled: boolean;
-	icon: string;
+  floorNumber: number;
+  isDisabled: boolean;
+  icon: string;
 }

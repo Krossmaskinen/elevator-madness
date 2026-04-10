@@ -1,15 +1,20 @@
-import type { Elevator } from "../../features/Elevator/types";
+import type { Elevator } from "$lib/types";
 
 export function hasInboundElevator(floor: number, elevators: Elevator[]) {
-  return elevators.some(el => el.targetFloor === floor);
+  return elevators.some((el) => el.targetFloor === floor);
 }
 
-export function getElevatorOnFloor(floor: number, elevators: Elevator[]): string | undefined {
-  return elevators.find(el => el.currentFloor === floor && !el.isMoving)?.id;
+export function getElevatorOnFloor(
+  floor: number,
+  elevators: Elevator[],
+): string | undefined {
+  return elevators.find((el) => el.currentFloor === floor && !el.isMoving)?.id;
 }
 
-
-export function getClosestElevatorToFloor(floor: number, elevators: Elevator[]) {
+export function getClosestElevatorToFloor(
+  floor: number,
+  elevators: Elevator[],
+) {
   let closestElevator: string | undefined;
   let closestDistance = NaN;
 
@@ -29,7 +34,7 @@ export function getClosestElevatorToFloor(floor: number, elevators: Elevator[]) 
       closestElevator = elevator.id;
       closestDistance = Math.abs(elevator.currentFloor - floor);
     }
-  })
+  });
 
   return closestElevator;
 }

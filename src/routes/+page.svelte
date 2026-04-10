@@ -8,8 +8,8 @@
     hasInboundElevator,
   } from "$lib/utils/elevatorUtils";
   import { getRandomNumber } from "$lib/utils/data-generator";
-  import type { Elevator } from "../features/Elevator/types";
   import { getFloors } from "$lib/utils/floorUtils";
+  import type { Elevator } from "$lib/types";
 
   const settings = {
     numberOfFloors: 20,
@@ -66,5 +66,5 @@
   {elevators}
   {elevatorService}
   {settings}
-  onCallRandom={() => callRandomFloors(5, elevators)}
+  onCallRandom={() => callRandomFloors(5, elevatorContext.getElevators())}
 />

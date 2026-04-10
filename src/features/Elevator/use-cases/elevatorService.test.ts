@@ -1,8 +1,8 @@
 import { getElevator } from "../public/data-generator";
 import type { IElevatorContext } from "../interfaces/elevatorContext";
-import type { Elevator } from "../types";
 import { ElevatorService } from "./elevatorService";
 import { getRandomNumber } from "$lib/utils/data-generator";
+import type { Elevator } from "$lib/types";
 
 describe("ElevatorService", () => {
   it("should call the elevator to a specific floor", () => {
